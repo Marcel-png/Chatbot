@@ -41,7 +41,7 @@ export default function Footer({
         </button>
         <button
           onClick={handleSend}
-          className="p-3 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition-all flex items-center justify-center"
+          className="p-3 hidden md:block bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition-all flex items-center justify-center"
           aria-label="Soumettre"
         >
           <FaArrowUp size={24} />
