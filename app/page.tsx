@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "./components/header";
+import Header from "./components/hearder";
 import ChatInput from "./components/footer";
 import MainSection from "./components/section";
 import { Message } from "./types";
