@@ -1,14 +1,10 @@
 "use client";
-import { useState, useEffect, KeyboardEvent } from "react";
-import Header from "./components/hearder";
-import Footer from "./components/footer";
-import MainSection from "./components/section";
 
-// Définition du type Message
-type Message = {
-  sender: "user" | "bot";
-  text: string;
-};
+import { useState, useEffect } from "react";
+import Header from "./components/Header";
+import ChatInput from "./components/ChatInput";
+import MainSection from "./components/MainSection";
+import { Message } from "./types";
 
 export default function App() {
   const [input, setInput] = useState<string>("");
@@ -17,12 +13,10 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const storedMessages = JSON.parse(
+      const stored = JSON.parse(
         localStorage.getItem("chatMessages") || "[]"
       ) as Message[];
-      if (Array.isArray(storedMessages)) {
-        setMessages(storedMessages);
-      }
+      if (Array.isArray(stored)) setMessages(stored);
     } catch (error) {
       console.error("Erreur lors du chargement des messages :", error);
     }
@@ -37,12 +31,14 @@ export default function App() {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
-    const newMessages: Message[] = [
-      ...messages,
-      { sender: "user", text: input },
-    ];
+    const userMessage: Message = {
+      sender: "user",
+      text: input,
+      id: crypto.randomUUID(),
+    };
+    const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput("");
     setLoading(true);
@@ -51,42 +47,46 @@ export default function App() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: userMessage.text }),
       });
 
+      const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.reply || `Erreur serveur (${res.status})`);
+        throw new Error(data?.reply || `Erreur serveur (${res.status})`);
       }
 
-      const data = await res.json();
       setMessages([
         ...newMessages,
-        { sender: "bot", text: data.reply || "Je ne comprends pas." },
+        {
+          sender: "bot",
+          text: data.reply || "Je ne comprends pas.",
+          id: crypto.randomUUID(),
+        },
       ]);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const msg =
+        error instanceof Error
+          ? error.message
+          : "Erreur de communication avec le serveur.";
       setMessages([
         ...newMessages,
-        { sender: "bot", text: error.message || "Erreur de communication avec le serveur." },
+        { sender: "bot", text: msg, id: crypto.randomUUID() },
       ]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") handleSend();
-  };
-
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+    <div className="flex h-screen flex-col bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50">
       <Header />
       <MainSection messages={messages} loading={loading} />
-      <Footer
+      <ChatInput
         input={input}
         setInput={setInput}
         handleSend={handleSend}
-        handleKeyDown={handleKeyDown}
+        loading={loading}
         setMessages={setMessages}
       />
     </div>
