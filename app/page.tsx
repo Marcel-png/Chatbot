@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "./components/Header";
-import ChatInput from "./components/ChatInput";
-import MainSection from "./components/MainSection";
+import Header from "./components/header";
+import ChatInput from "./components/footer";
+import MainSection from "./components/section";
 import { Message } from "./types";
 
 export default function App() {
