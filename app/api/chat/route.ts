@@ -5,7 +5,7 @@ const SYSTEM_PROMPT =
 
 
 const RATE_LIMIT_WINDOW_MS = 60_000; 
-const RATE_LIMIT_MAX = 10; 
+const RATE_LIMIT_MAX = 15; 
 const ipHits = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string): boolean {
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const model = process.env.OPENROUTER_MODEL || "mistralai/mistral-7b-instruct";
+    const model = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
