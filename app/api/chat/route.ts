@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const model = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
+    const model = process.env.OPENROUTER_MODEL || "openrouter/free";
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
